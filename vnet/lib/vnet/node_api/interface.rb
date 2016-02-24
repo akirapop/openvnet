@@ -82,7 +82,7 @@ module Vnet::NodeApi
           create_interface_port(model, datapath_id, port_name)
 
           mac_lease = add_mac_lease(model, mac_address, mac_range_group_id)
-          add_lease(model, mac_lease, network_id, ipv4_address)
+          add_ip_lease(model, mac_lease, network_id, ipv4_address)
 
           model
         }
@@ -139,7 +139,7 @@ module Vnet::NodeApi
         model_class(:interface_port).create(options)
       end
 
-      def add_lease(model, mac_lease, network_id, ipv4_address)
+      def add_ip_lease(model, mac_lease, network_id, ipv4_address)
         return true if network_id.nil? || ipv4_address.nil?
 
         ip_lease = model_class(:ip_lease).create(mac_lease: mac_lease,
