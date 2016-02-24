@@ -119,7 +119,7 @@ module Vnet
     INTERFACE_PORT_DEACTIVATE = "interface_port_deactivate"
 
     #
-    # Interface Port events:
+    # Interface Network Assoc events:
     #
 
     INTERFACE_NETWORK_ASSOC_CREATED_ITEM = "interface_network_assoc_created_item"
