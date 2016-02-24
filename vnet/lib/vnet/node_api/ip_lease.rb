@@ -28,6 +28,8 @@ module Vnet::NodeApi
           dispatch_created_item_events(ip_lease)
         end
 
+        # TODO: Handle InterfaceNetworkAssoc.
+
         ip_lease.interface.security_groups.each do |group|
           dispatch_update_sg_ip_addresses(group)
         end

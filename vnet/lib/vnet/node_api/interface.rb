@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 module Vnet::NodeApi
   class Interface < EventBase
     class << self
@@ -93,10 +94,10 @@ module Vnet::NodeApi
 
         filter = { interface_id: model.id }
 
-        # Need to dispatch event for InterfaceNetworkAssoc.
-
         # 0001_origin
         InterfacePort.dispatch_created_where(filter, model.created_at)
+        #
+        InterfaceNetworkAssoc.dispatch_created_where(filter, model.created_at)
       end
 
       def dispatch_deleted_item_events(model)
@@ -119,14 +120,16 @@ module Vnet::NodeApi
         Translation.dispatch_deleted_where(filter, model.deleted_at)
         # 0002_services
         # lease_policy_base_interfaces: :destroy,
+        #
+        InterfaceNetworkAssoc.dispatch_deleted_where(filter, model.deleted_at)
       end
 
-      def create_interface_port(interface, datapath_id, port_name)
+      def create_interface_port(model, datapath_id, port_name)
         singular = (datapath_id || port_name) ? true : nil
 
         options = {
-          interface_id: interface.id,
-          interface_mode: interface.mode,
+          interface_id: model.id,
+          interface_mode: model.mode,
           datapath_id: datapath_id,
 
           port_name: port_name,
@@ -136,13 +139,16 @@ module Vnet::NodeApi
         model_class(:interface_port).create(options)
       end
 
-      def add_lease(interface, mac_lease, network_id, ipv4_address)
+      def add_lease(model, mac_lease, network_id, ipv4_address)
         return true if network_id.nil? || ipv4_address.nil?
 
         ip_lease = model_class(:ip_lease).create(mac_lease: mac_lease,
                                                  network_id: network_id,
                                                  ipv4_address: ipv4_address) || return
-        interface.add_ip_lease(ip_lease) || return
+        model.add_ip_lease(ip_lease) || return
+
+        model_class(:interface_network_assoc).create(interface_id: model.id,
+                                                     network_id: network_id)
 
         return true
       end

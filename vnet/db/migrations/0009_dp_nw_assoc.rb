@@ -3,11 +3,13 @@
 Sequel.migration do
   up do
 
-    create_table(:interface_networks) do
+    create_table(:interface_network_assocs) do
       primary_key :id
 
       Integer :interface_id, :null => false
       Integer :network_id, :null => false
+
+      #FalseClass :
 
       DateTime :created_at, :null=>false
       DateTime :updated_at, :null=>false
@@ -20,7 +22,7 @@ Sequel.migration do
   end
 
   down do
-    drop_table(:interface_networks,
+    drop_table(:interface_network_assocs,
               )
   end
 end

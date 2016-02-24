@@ -408,6 +408,7 @@ module Vnet
     autoload :DnsService, 'vnet/node_api/dns_service'
     autoload :DnsRecord, 'vnet/node_api/dns_record'
     autoload :Interface, 'vnet/node_api/interface.rb'
+    autoload :InterfaceNetworkAssoc, 'vnet/node_api/interface_network_assoc.rb'
     autoload :InterfacePort, 'vnet/node_api/interface_port.rb'
     autoload :IpAddress, 'vnet/node_api/models.rb'
     autoload :IpLease, 'vnet/node_api/ip_lease.rb'
