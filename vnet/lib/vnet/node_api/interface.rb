@@ -96,8 +96,6 @@ module Vnet::NodeApi
 
         # 0001_origin
         InterfacePort.dispatch_created_where(filter, model.created_at)
-        #
-        InterfaceNetworkAssoc.dispatch_created_where(filter, model.created_at)
       end
 
       def dispatch_deleted_item_events(model)
@@ -147,8 +145,8 @@ module Vnet::NodeApi
                                                  ipv4_address: ipv4_address) || return
         model.add_ip_lease(ip_lease) || return
 
-        model_class(:interface_network_assoc).create(interface_id: model.id,
-                                                     network_id: network_id)
+        # TODO: Move to ip_lease.
+        InterfaceNetworkAssoc.attached_ip_lease(model.id, network_id)
 
         return true
       end

@@ -82,6 +82,20 @@ module Vnet::NodeApi
         internal_destroy(model_class[filter])
       end
 
+      def default_create(options)
+        model_class.create(options).tap { |model|
+          next if model.nil?
+          dispatch_created_item_events(model)
+        }
+      end
+
+      def default_destroy(filter)
+        internal_destroy(model_class[filter]).tap { |model|
+          next if model.nil?
+          dispatch_deleted_item_events(model)
+        }
+      end
+
       def dispatch_created_item_events(model)
         raise NotImplementedError
       end

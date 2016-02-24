@@ -59,6 +59,7 @@ module Vnet::NodeApi
         end
 
         dispatch_event(INTERFACE_RELEASED_IPV4_ADDRESS, id: interface.id, ip_lease_id: ip_lease.id)
+
         # re-add released ip_retentions
         ip_lease.ip_retentions.each do |ip_retention|
           dispatch_event(
