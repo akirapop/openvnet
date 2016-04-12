@@ -160,6 +160,9 @@ module Vnet
       nil
     end
 
+    def do_initialize
+    end
+
     #
     # Internal methods:
     #
@@ -168,6 +171,14 @@ module Vnet
 
     def log_format(message, values = nil)
       (@log_prefix || "") + message + (values ? " (#{values})" : '')
+    end
+
+    def log_format_h(message, values)
+      str = values.map { |value|
+        value.join(':')
+      }.join(' ')
+
+      log_format(message, str)
     end
 
     #
