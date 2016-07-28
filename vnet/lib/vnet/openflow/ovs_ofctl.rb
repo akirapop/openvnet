@@ -7,6 +7,7 @@ module Vnet::Openflow
     attr_accessor :ovs_vsctl
     attr_accessor :verbose
     attr_accessor :switch_name
+    attr_accessor :bridge_name
 
     def initialize(datapath_id)
       @dpid = datapath_id
@@ -16,10 +17,13 @@ module Vnet::Openflow
       conf = Vnet::Configurations::Vna.conf
       # @ovs_ofctl = conf.ovs_ofctl_path
       # @ovs_vsctl = conf.ovs_vsctl_path
-      @ovs_ofctl = 'ovs-ofctl -O OpenFlow13'
-      @ovs_ofctl_10 = 'ovs-ofctl -O OpenFlow10'
-      @ovs_vsctl = 'ovs-vsctl'
-      @switch_name = get_bridge_name(datapath_id)
+      @remote_ovs = ! ["127.0.0.1", "localhost", ""].include?(conf.ovs.host)
+
+      @ovs_ofctl = "ovs-ofctl -O #{conf.ovs.protocol}"
+      @ovs_ofctl_10 = "ovs-ofctl -O OpenFlow10"
+      @ovs_vsctl = @remote_ovs ? "ovs-vsctl --db=tcp:#{conf.ovs.host}:#{conf.ovs.mgr_port}" : 'ovs-vsctl'
+      @bridge_name = get_bridge_name(datapath_id)
+      @switch_name = @remote_ovs ? "tcp:#{conf.ovs.host}:#{conf.ovs.ctl_port}" : @bridge_name
 
       # @verbose = Dcmgr.conf.verbose_openflow
       @verbose = false
@@ -102,7 +106,7 @@ module Vnet::Openflow
             when :no_receive then 'no-receive'
             end
 
-      port_no = switch_name if port_no == Controller::OFPP_LOCAL
+      port_no = bridge_name if port_no == Controller::OFPP_LOCAL
 
       system("#{@ovs_ofctl_10} mod-port #{switch_name} #{port_no} #{arg}")
     end
