@@ -21,6 +21,13 @@ module Vnet::Configurations
       end
     end
 
+    class OvsCfg < Fuguta::Configuration
+      param :host
+      param :ctl_port
+      param :mgr_port
+      param :protocol, :default => "OpenFlow13"
+    end
+
     class Network < Fuguta::Configuration
       param :uuid
 
@@ -38,6 +45,10 @@ module Vnet::Configurations
     DSL do
       def node(&block)
         @config[:node] = Node.new.tap {|node| node.parse_dsl(&block) if block }
+      end
+
+      def ovs(&block)
+        @config[:ovs] = OvsCfg.new.tap {|c| c.parse_dsl(&block) if block }
       end
 
       def network(&block)
