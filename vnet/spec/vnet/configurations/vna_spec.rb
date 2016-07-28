@@ -16,6 +16,11 @@ describe Vnet::Configurations::Vna do
     it { expect(subject.node.addr.port).to eq 19103 }
     it { expect(subject.node.addr_string).to eq "tcp://127.0.0.1:19103" }
 
+    it { expect(subject.ovs.host.to_eq "127.0.0.1") }
+    it { expect(subject.ovs.protocol.to_eq "OpenFlow13") }
+    it { expect(subject.ovs.ctl_port.to_eq 16633) }
+    it { expect(subject.ovs.mgr_port.to_eq 16640) }
+
     it { expect(subject.node_api_proxy).to eq :rpc }
 
     # trema
