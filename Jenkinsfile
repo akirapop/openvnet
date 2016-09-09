@@ -9,9 +9,11 @@ node {
     sh "/usr/bin/env"
     sh "git rev-parse HEAD > .git_sha1"
     def git_sha1 = readFile(".git_sha1").trim()
-    build job: "openvnet/rpmbuild",
-          parameters: [
-            [$class: 'StringParameterValue', name: 'GIT_REF', value: git_sha1],
-            [$class: 'StringParameterValue', name: 'BUILD_OS', value: 'el6']
-          ]
+    for (os_name in ['el6', 'el7']) {
+      build job: "openvnet/rpmbuild",
+            parameters: [
+              [$class: 'StringParameterValue', name: 'GIT_REF', value: git_sha1],
+              [$class: 'StringParameterValue', name: 'BUILD_OS', value: os_name]
+            ]
+    }
 }
