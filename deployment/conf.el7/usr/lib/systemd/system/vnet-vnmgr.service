@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenVNet management process
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/openvnet
+User=vnet-vnmgr
+WorkingDirectory=${VNET_ROOT}/vnet
+ExecStart=/usr/bin/scl enable rh-ruby23 -- bundle exec ./bin/vnmgr >> ${LOG_DIRECTORY}/vnmgr.log
+
+[Install]
+WantedBy=multi-user.target

@@ -36,6 +36,9 @@ check_dependency createrepo createrepo
 
 # Make sure that we work with the correct version of openvnet-ruby
 sudo cp "${current_dir}/../yum_repositories/${BUILD_TYPE}/openvnet-third-party.repo" /etc/yum.repos.d
+if ! rpm -q centos-release-scl > /dev/null; then
+  sudo yum install -y centos-release-scl
+fi
 
 sudo yum-builddep -y "$OPENVNET_SPEC_FILE"
 
@@ -43,6 +46,7 @@ sudo yum-builddep -y "$OPENVNET_SPEC_FILE"
 # Prepare build directories and put the source in place.
 #
 
+. /opt/rh/rh-ruby23/enable
 OPENVNET_SRC_BUILD_DIR="${WORK_DIR}/SOURCES/openvnet"
 if [[ -d "$OPENVNET_SRC_BUILD_DIR" && -z "${SKIP_CLEANUP}" ]]; then
   rm -rf "$OPENVNET_SRC_BUILD_DIR"
