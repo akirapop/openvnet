@@ -21,10 +21,14 @@ function check_dependency() {
   }
 }
 
-if [ "${BUILD_TYPE}" == "stable" ] && [ -z "${RPM_VERSION}" ]; then
-  echo "You need to set RPM_VERSION when building a stable version. This should contain the name of a branch of tag for git to checkout.
+if [ "${BUILD_TYPE}" == "stable" ] && [ -z "${RELEASE_SUFFIX}" ]; then
+  echo "You need to set RELEASE_SUFFIX when building a stable version. This should contain the name of a branch of tag for git to checkout.
         Ex: v0.7"
   exit 1
+elif [[ -z "${RELEASE_SUFFIX}" ]]; then
+  # RELEASE_SUFFIX is recommended to pass to this script. The line is for
+  # the backward compatibility to the current CI infrastructure.
+  RELEASE_SUFFIX=$(${current_dir}/gen-dev-build-tag.sh)
 fi
 
 #
@@ -67,27 +71,20 @@ mkdir -p "${OPENVNET_SRC_BUILD_DIR}"
 # Build the packages
 #
 
+repo_rel_path="packages/rhel/${RHEL_RELVER}/vnet/${RELEASE_SUFFIX}"
 if [ "$BUILD_TYPE" == "stable" ]; then
   # If we're building a stable version we must make sure we checkout the correct version of the code.
-  repo_rel_path="packages/rhel/${RHEL_RELVER}/vnet/${RPM_VERSION}"
 
-  git checkout "${RPM_VERSION}"
-  echo "Building the following commit for stable version ${RPM_VERSION}"
+  git checkout "${RELEASE_SUFFIX}"
+  echo "Building the following commit for stable version ${RELEASE_SUFFIX}"
   git log -n 1 --format=short
 
   rpmbuild -ba --define "_topdir ${WORK_DIR}" "${OPENVNET_SPEC_FILE}"
 else
   # If we're building a development version we set the git commit time and hash as release
-  timestamp=$(date --date="$(git show -s --format=%cd --date=iso HEAD)" +%Y%m%d%H%M%S)
-  RELEASE_SUFFIX="${timestamp}git$(git rev-parse --short HEAD)"
-
-  repo_rel_path="packages/rhel/${RHEL_RELVER}/vnet/${RELEASE_SUFFIX}"
 
   rpmbuild -ba --define "_topdir ${WORK_DIR}" --define "dev_release_suffix ${RELEASE_SUFFIX}" "${OPENVNET_SPEC_FILE}"
 fi
-
-# Save it as a file so we can see from out of container.
-echo "$repo_rel_path" > /var/tmp/repo_rel.path
 
 #
 # Prepare the yum repo

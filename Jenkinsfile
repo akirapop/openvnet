@@ -23,7 +23,11 @@ BUILD_OS=$BUILD_OS
 node {
     stage "Checkout"
     checkout scm
-    writeFile(file: "build.env", text: build_env)
+    // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline
+    // https://issues.jenkins-ci.org/browse/JENKINS-26133
+    def RELEASE_SUFFIX=sh(returnStdout: true, script: "./deployment/packagebuild/gen-dev-build-tag.sh").trim()
+    writeFile(file: "build.env", text: build_env + "\nRELEASE_SUFFIX=${RELEASE_SUFFIX}\n")
     stage "Build"
     sh "./deployment/docker/build.sh ./build.env"
+    sh "./deployment/docker/test-rpm-install.sh ./build.env"
 }
