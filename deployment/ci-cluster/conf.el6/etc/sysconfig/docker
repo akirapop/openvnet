@@ -4,7 +4,7 @@
 # These will be parsed by the sysv initscript and appended
 # to the arguments list passed to docker -d
 
-other_args="--group=dockerroot"
+other_args="--group=dockerroot -s devicemapper --storage-opt dm.thinpooldev=/dev/mapper/vg0-docker"
 DOCKER_CERT_PATH=/etc/docker
 
 # Resolves: rhbz#1176302 (docker issue #407)

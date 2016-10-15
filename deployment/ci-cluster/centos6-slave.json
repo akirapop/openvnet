@@ -37,6 +37,30 @@
           "hostonly",
           "--hostonlyadapter2",
           "{{user `host_switch`}}"
+        ],
+        [
+          "createmedium",
+          "disk",
+          "--filename",
+          "data.vdi",
+          "--size",
+          "52000",
+          "--format",
+          "VDI"
+        ],
+        [
+          "storageattach",
+          "{{.Name}}",
+          "--storagectl",
+          "SATA Controller",
+          "--port",
+          "1",
+          "--device",
+          "0",
+          "--type",
+          "hdd",
+          "--medium",
+          "data.vdi"
         ]
       ],
       "vboxmanage_post": [
@@ -75,6 +99,11 @@
       "execute_command": "chmod +x {{ .Path }}; echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
       "inline": [
         "cp /tmp/fastestmirror.conf /etc/yum/pluginconf.d/fastestmirror.conf",
+        "yum install -y gdisk",
+        "sgdisk -n 1::: /dev/sdb; sgdisk -p /dev/sdb",
+        "pvcreate /dev/sdb1",
+        "vgcreate -s 32MB vg0 /dev/sdb1",
+        "lvcreate --thin --size 50GB vg0/docker",
         "yum install -y java-1.8.0-openjdk git acpid epel-release tar rsync redhat-lsb-core",
         "chown -R root:root /tmp/conf.el6/; cp -a -t / /tmp/conf.el6/*",
         "useradd -d /var/lib/jenkins --system --create-home --user-group jenkins",
