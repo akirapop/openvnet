@@ -1,5 +1,5 @@
 #!groovy
 
 node () {
-   sh "./cicluster/build.sh"
+   sh "./ci-cluster/build.sh"
 }
