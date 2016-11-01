@@ -1,5 +1,5 @@
 #!groovy
 
 node () {
-   checkout scm
+   sh "./cicluster/build.sh"
 }
